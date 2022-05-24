@@ -46,6 +46,13 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - portainer_data:/data
 
+  rabbitmq:
+    container_name: rabbitmq
+    restart: always
+    ports:
+        - "5672:5672"
+        - "15672:15672"
+
   pgadmin:
     container_name: pgadmin
     environment:
@@ -73,10 +80,12 @@ services:
       - ASPNETCORE_ENVIRONMENT=Development
       - CacheSettings:ConnectionString=basketdb:6379
       - "GrpcSettings:DiscountUrl=http://discount.grpc"
+      - "EventBusSettings:HostAddress=amqp://guest:guest@rabbitmq:5672"
     ports:
       - "8001:80"
     depends_on:
       - basketdb
+      - rabbitmq
 
   discount.api:
     container_name: discount.api
